@@ -1,9 +1,18 @@
+from logging import exception
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import base64
 import ollama
 import os
+from  time import *
+import subprocess
+import  sys
+import  contextlib
+
+
+
+
 # Load the uploaded customer data file
 uploaded_file = st.sidebar.file_uploader("Upload Customer Data (Excel):", type=["xlsx"])
 
@@ -89,18 +98,31 @@ if uploaded_file:
         st.markdown(f"**vivekda05** {chat['answer']}")
 
 
+class SuppressStdoutAndStderr:
+    def __enter__(self):
+        self.stdout = sys.stdout
+        self.stderr = sys.stderr
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        sys.stdout.close()
+        sys.stderr.close()
+        sys.stdout = self.stdout
+        sys.stderr = self.stderr
 
 
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-app_path = os.path.join(script_dir, "aptemp.py")
-
-# Write the embedded app code to app.py
-with open(app_path, "w") as app_file:
-    app_file.write(app_path)
-
-# Command to run the Streamlit application
-command = f"streamlit run apps1.py" 
-
-# Execute the command
-os.system(command)
+# Launch the Streamlit app
+try:
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get current script directory
+    command = f"streamlit run {script_dir}\\apps.py --browser.serverAddress=localhost --server.runOnSave=false"
+    with SuppressStdoutAndStderr():
+        if __name__ == "__main__":
+            # Launch Streamlit app
+            subprocess.Popen(command, shell=True)  # Non-blocking, allows browser tab to open
+            sleep(3)  # Give Streamlit time to initialize
+            print("Streamlit app launched in browser!")
+except OSError as e :
+    print(f"An error occurred while launching the Streamlit app:")
+    print("Please check the file path and command syntax.")
