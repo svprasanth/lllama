@@ -116,12 +116,16 @@ class SuppressStdoutAndStderr:
 # Launch the Streamlit app
 try:
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Get current script directory
-    command = f"streamlit run {script_dir}\\apps.py --browser.serverAddress=localhost --server.runOnSave=false"
+    command = f"streamlit run apps.py --browser.serverAddress=localhost --server.runOnSave=false"
+    command1=f"ollama serve"
     with SuppressStdoutAndStderr():
         if __name__ == "__main__":
             # Launch Streamlit app
             subprocess.Popen(command, shell=True)  # Non-blocking, allows browser tab to open
-            sleep(3)  # Give Streamlit time to initialize
+            subprocess.Popen(command1, shell=True)  # Non-blocking, allows browser tab to open
+            
+            
+            sleep(5)  # Give Streamlit time to initialize
             print("Streamlit app launched in browser!")
 except OSError as e :
     print(f"An error occurred while launching the Streamlit app:")
